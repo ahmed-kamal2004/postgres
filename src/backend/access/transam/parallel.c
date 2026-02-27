@@ -36,6 +36,7 @@
 #include "pgstat.h"
 #include "storage/ipc.h"
 #include "storage/predicate.h"
+#include "storage/proc.h"
 #include "storage/spin.h"
 #include "tcop/tcopprot.h"
 #include "utils/combocid.h"
@@ -1327,7 +1328,6 @@ ParallelWorkerMain(Datum main_arg)
 	InitializingParallelWorker = true;
 
 	/* Establish signal handlers. */
-	pqsignal(SIGTERM, die);
 	BackgroundWorkerUnblockSignals();
 
 	/* Determine and set our parallel worker number. */

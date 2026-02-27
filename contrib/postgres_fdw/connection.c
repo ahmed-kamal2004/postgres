@@ -150,7 +150,8 @@ static void pgfdw_subxact_callback(SubXactEvent event,
 								   SubTransactionId mySubid,
 								   SubTransactionId parentSubid,
 								   void *arg);
-static void pgfdw_inval_callback(Datum arg, int cacheid, uint32 hashvalue);
+static void pgfdw_inval_callback(Datum arg, SysCacheIdentifier cacheid,
+								 uint32 hashvalue);
 static void pgfdw_reject_incomplete_xact_state_change(ConnCacheEntry *entry);
 static void pgfdw_reset_xact_state(ConnCacheEntry *entry, bool toplevel);
 static bool pgfdw_cancel_query(PGconn *conn);
@@ -666,8 +667,9 @@ disconnect_pg_server(ConnCacheEntry *entry)
 }
 
 /*
- * Return true if the password_required is defined and false for this user
- * mapping, otherwise false. The mapping has been pre-validated.
+ * Check and return the value of password_required, if defined; otherwise,
+ * return true, which is the default value of it.  The mapping has been
+ * pre-validated.
  */
 static bool
 UserMappingPasswordRequired(UserMapping *user)
@@ -1309,7 +1311,7 @@ pgfdw_subxact_callback(SubXactEvent event, SubTransactionId mySubid,
  * individual option values, but it seems too much effort for the gain.
  */
 static void
-pgfdw_inval_callback(Datum arg, int cacheid, uint32 hashvalue)
+pgfdw_inval_callback(Datum arg, SysCacheIdentifier cacheid, uint32 hashvalue)
 {
 	HASH_SEQ_STATUS scan;
 	ConnCacheEntry *entry;

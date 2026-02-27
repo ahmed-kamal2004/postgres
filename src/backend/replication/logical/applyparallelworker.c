@@ -166,7 +166,9 @@
 #include "replication/origin.h"
 #include "replication/worker_internal.h"
 #include "storage/ipc.h"
+#include "storage/latch.h"
 #include "storage/lmgr.h"
+#include "storage/proc.h"
 #include "tcop/tcopprot.h"
 #include "utils/inval.h"
 #include "utils/memutils.h"
@@ -879,7 +881,6 @@ ParallelApplyWorkerMain(Datum main_arg)
 	 * receiving SIGTERM.
 	 */
 	pqsignal(SIGHUP, SignalHandlerForConfigReload);
-	pqsignal(SIGTERM, die);
 	pqsignal(SIGUSR2, SignalHandlerForShutdownRequest);
 	BackgroundWorkerUnblockSignals();
 

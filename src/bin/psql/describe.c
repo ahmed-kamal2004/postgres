@@ -3797,7 +3797,7 @@ describeRoles(const char *pattern, bool verbose, bool showSystem)
 		return false;
 
 	nrows = PQntuples(res);
-	attr = pg_malloc0((nrows + 1) * sizeof(*attr));
+	attr = pg_malloc0_array(char *, nrows + 1);
 
 	printTableInit(&cont, &myopt, _("List of roles"), ncols, nrows);
 
@@ -5306,7 +5306,7 @@ listSchemas(const char *pattern, bool verbose, bool showSystem)
 			 * storing "Publications:" string) + publication schema mapping
 			 * count +  1 (for storing NULL).
 			 */
-			footers = (char **) pg_malloc((1 + pub_schema_tuples + 1) * sizeof(char *));
+			footers = pg_malloc_array(char *, 1 + pub_schema_tuples + 1);
 			footers[0] = pg_strdup(_("Publications:"));
 
 			/* Might be an empty set - that's ok */
@@ -6806,7 +6806,7 @@ describeSubscriptions(const char *pattern, bool verbose)
 	printQueryOpt myopt = pset.popt;
 	static const bool translate_columns[] = {false, false, false, false,
 		false, false, false, false, false, false, false, false, false, false,
-	false, false, false, false};
+	false, false, false, false, false};
 
 	if (pset.sversion < 100000)
 	{
@@ -6894,6 +6894,11 @@ describeSubscriptions(const char *pattern, bool verbose)
 						  ",  subconninfo AS \"%s\"\n",
 						  gettext_noop("Synchronous commit"),
 						  gettext_noop("Conninfo"));
+
+		if (pset.sversion >= 190000)
+			appendPQExpBuffer(&buf,
+							  ", subwalrcvtimeout AS \"%s\"\n",
+							  gettext_noop("Receiver timeout"));
 
 		/* Skip LSN is only supported in v15 and higher */
 		if (pset.sversion >= 150000)
