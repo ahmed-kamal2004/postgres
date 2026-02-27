@@ -1525,9 +1525,11 @@ grouping_planner(PlannerInfo *root, double tuple_fraction,
 	FinalPathExtraData extra;
 	ListCell   *lc;
 
+	elog(INFO, "Our grupping one");
 	/* Tweak caller-supplied tuple_fraction if have LIMIT/OFFSET */
 	if (parse->limitCount || parse->limitOffset)
 	{
+		elog(INFO, "We have a limit");
 		tuple_fraction = preprocess_limit(root, tuple_fraction,
 										  &offset_est, &count_est);
 

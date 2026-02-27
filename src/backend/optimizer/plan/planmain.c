@@ -96,6 +96,7 @@ query_planner(PlannerInfo *root,
 	Assert(parse->jointree->fromlist != NIL);
 	if (list_length(parse->jointree->fromlist) == 1)
 	{
+		elog(INFO, "Trivial case: single RTE_RESULT relation");
 		Node	   *jtnode = (Node *) linitial(parse->jointree->fromlist);
 
 		if (IsA(jtnode, RangeTblRef))
@@ -158,9 +159,14 @@ query_planner(PlannerInfo *root,
 
 				return final_rel;
 			}
+			elog(INFO, "2");
 		}
+		elog(INFO, "list len %d", list_length(parse->jointree->fromlist));
+		elog(INFO, "jointree %s", nodeToString(parse->jointree));
+		elog(INFO, "1");
 	}
 
+	elog(INFO, "Nono-trivial case: jointree has multiple rels");
 	/*
 	 * Construct RelOptInfo nodes for all base relations used in the query.
 	 * Appendrel member relations ("other rels") will be added later.
@@ -300,6 +306,24 @@ query_planner(PlannerInfo *root,
 	if (!final_rel || !final_rel->cheapest_total_path ||
 		final_rel->cheapest_total_path->param_info != NULL)
 		elog(ERROR, "failed to construct the join relation");
+	
+	elog(INFO, "CREATED Planner successfully");
+
+
+	if(final_rel->relids) {
+		elog(INFO, "multiple");
+		elog(INFO, "final_rel->relids: %d", final_rel->relids->nwords);
+		elog(INFO, "number of rows%d", final_rel-> rows);
+		elog(INFO, "number of paths%d", list_length(final_rel->pathlist));
+		elog(INFO, "number of pages%d", final_rel->pages);
+	} 
+
+	if(final_rel->relid) {
+		elog(INFO, "single");
+		elog(INFO, "final_rel->relid: %d", final_rel->relid);
+		elog(INFO, "number of paths%d", list_length(final_rel->pathlist));
+		elog(INFO, "number of pages%d", final_rel->pages);
+	}
 
 	return final_rel;
 }

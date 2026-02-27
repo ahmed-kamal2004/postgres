@@ -90,6 +90,8 @@ static bool replace_relid_callback(Node *node,
 List *
 remove_useless_joins(PlannerInfo *root, List *joinlist)
 {
+	elog(INFO, "checking for removable joins");
+	elog(INFO, "join_info_list has %d entries", list_length(root->join_info_list));
 	ListCell   *lc;
 
 	/*
@@ -138,6 +140,9 @@ restart:
 		goto restart;
 	}
 
+
+	elog(INFO, "done checking for removable joins");
+	elog(INFO, "join_info_list has %d entries", list_length(root->join_info_list));
 	return joinlist;
 }
 
@@ -182,12 +187,14 @@ join_is_removable(PlannerInfo *root, SpecialJoinInfo *sjinfo)
 		return false;
 
 	innerrel = find_base_rel(root, innerrelid);
-
+	elog(INFO, "RelOptInfo:\n%s", nodeToString(innerrel));
 	/*
 	 * Before we go to the effort of checking whether any innerrel variables
 	 * are needed above the join, make a quick check to eliminate cases in
 	 * which we will surely be unable to prove uniqueness of the innerrel.
 	 */
+
+	printf(INFO, "STOP HERE");
 	if (!rel_supports_distinctness(root, innerrel))
 		return false;
 

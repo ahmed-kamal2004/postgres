@@ -1466,6 +1466,7 @@ deconstruct_jointree(PlannerInfo *root)
 	top_jdomain = linitial_node(JoinDomain, root->join_domains);
 	top_jdomain->jd_relids = NULL;	/* filled during deconstruct_recurse */
 
+	elog(INFO, "deconstructing jointree");
 	/* Start recursion at top of jointree */
 	Assert(root->parse->jointree != NULL &&
 		   IsA(root->parse->jointree, FromExpr));
